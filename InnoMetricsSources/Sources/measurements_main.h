@@ -344,14 +344,10 @@ void* measurements_main(void *unused) {
         XSelectInput(display, windows[i], EVENT_MASK);
     }
 //    Register Input device events version 1
-//    if (XInputListener::SelectXInputEvents(display)) {
-//        return -1;
-//    }
-
-    //Register Input device events version 2
-    if (XInputListener::RegisterEventsXi2(display)) {
-        return NULL;
+    if (XInputListener::SelectXInputEvents(display)) {
+        return 0;
     }
+
 
     delete[] windows;
 
@@ -362,13 +358,12 @@ void* measurements_main(void *unused) {
         XNextEvent(display, &event);
         switch (event.type) {
             case GenericEvent: {
-                //cout << cookie->evtype << "\n";
                 switch (cookie->evtype) {
-                    case XI_KeyPress:
-                    case XI_ButtonPress:
+                    case KeyPress:
+                    case ButtonPress:
                         break;
-                    case XI_KeyRelease:
-                    case XI_ButtonRelease: {
+                    case KeyRelease:
+                    case ButtonRelease: {
                         if (windowInfo->Type >= BROWSER) {//(windowMap[lastWindow] >= BROWSER) {
                             string winName = WindowHelper::GetWindowNameMultiByte(display, lastWindow);
                             if (windowInfo->WindowTitle != winName) {
@@ -377,25 +372,16 @@ void* measurements_main(void *unused) {
                         }
                         break;
                     }
-                    case XI_RawButtonRelease:
-                    case XI_RawKeyRelease: {
-                        if (windowInfo->Type == BROWSER_CHROME) {//(windowMap[lastWindow] == BROWSER_CHROME) {
-                            string winName = WindowHelper::GetWindowNameMultiByte(display, lastWindow);
-                            if (windowInfo->WindowTitle != winName) {
-                                LogWindowInfo(display, focusedWindow, true);
-                            }
-                        }
-                        break;
-                    }
-                    case XI_DeviceChanged:
-                        //printf("Device changed\n");
-                        break;
-                    case XI_HierarchyChanged:
-                        //printf("HierarchyChanged\n");;
-                        break;
-                    case XI_PropertyEvent:
-                        //printf("PropertyEvent\n");
-                        break;
+//                    case RawButtonRelease:
+//                    case RawKeyRelease: {
+//                        if (windowInfo->Type == BROWSER_CHROME) {//(windowMap[lastWindow] == BROWSER_CHROME) {
+//                            string winName = WindowHelper::GetWindowNameMultiByte(display, lastWindow);
+//                            if (windowInfo->WindowTitle != winName) {
+//                                LogWindowInfo(display, focusedWindow, true);
+//                            }
+//                        }
+//                        break;
+//                    }
                     default:
                         break;
 
