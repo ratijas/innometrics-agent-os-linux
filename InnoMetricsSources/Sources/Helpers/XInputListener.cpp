@@ -14,19 +14,20 @@ int XInputListener::KeyReleaseType = INVALID_EVENT_TYPE;
 int XInputListener::ProximityInType = INVALID_EVENT_TYPE;
 int XInputListener::ProximityOutType = INVALID_EVENT_TYPE;
 
-int XInputListener::RegisterEvents(Display *dpy, XDeviceInfo *info, Bool handle_proximity, Window window) {
+int XInputListener::RegisterEvents(Display *dpy, XIDeviceInfo *info, Bool handle_proximity, Window window) {
     int number = 0;    /* number of events registered */
-    XEventClass event_list[7];
+    XIEventClass event_list[7];
     int i;
-    XDevice *device;
-    XInputClassInfo *ip;
+    XIDeviceInfo *device;
+    XIAnyClassInfo *ip;
+
 
     int screen = DefaultScreen(dpy);
     Window root_window = (window == -1)
             ? RootWindow(dpy, screen)
             : window;
 
-    device = XOpenDevice(dpy, info->id);
+    device = XOpenDevice(dpy, info->deviceid);
 
     if (!device) {
         printf("Unable to open device '%lu'\n", info->id);
@@ -78,9 +79,9 @@ int XInputListener::RegisterEvents(Display *dpy, XDeviceInfo *info, Bool handle_
     return number;
 }
 
-XDeviceInfo **XInputListener::GetDevices(Display *display, int &count) {
-    XDeviceInfo *devices;
-    XDeviceInfo **found;
+XIDeviceInfo **XInputListener::GetDevices(Display *display, int &count) {
+    XIDeviceInfo *devices;
+    XIDeviceInfo **found;
     int loop;
     int numOfDevices;
     XID id = (XID) -1;
@@ -92,12 +93,11 @@ XDeviceInfo **XInputListener::GetDevices(Display *display, int &count) {
         XI_EYETRACKER XI_CURSORKEYS XI_FOOTMOUSE XI_JOYSTICK
     */
 
-    Atom xiMouse = XInternAtom(display, XI_MOUSE, false);
+    Atom xiMouse = XInternAtom(display, "XI_MOUSE", false);
     Atom xiKeyBoard = XInternAtom(display, XI_KEYBOARD, false);
     Atom xiTouchPad = XInternAtom(display, XI_TOUCHPAD, false);
 
-
-    devices = XListInputDevices(display, &numOfDevices);
+    devices = XIQueryDevice(display, XIAllDevices, &numOfDevices);
 
     count = 0;
     for (loop = 0; loop < numOfDevices; loop++) {
@@ -109,7 +109,7 @@ XDeviceInfo **XInputListener::GetDevices(Display *display, int &count) {
             count++;
         }
     }
-    found = new XDeviceInfo *[count];
+    found = new XIDeviceInfo *[count];
     int c = 0;
     for (loop = 0; loop < numOfDevices; loop++) {
         if ((devices[loop].use >= IsXExtensionDevice) &&
@@ -159,7 +159,7 @@ int XInputListener::SelectXInputEvents(Display *display, Window window) {
 
     //TODO: Need to implement the function of getting the id automatically
 
-    XDeviceInfo **infos;
+    XIDeviceInfo **infos;
 
     Bool handle_proximity = True;
 

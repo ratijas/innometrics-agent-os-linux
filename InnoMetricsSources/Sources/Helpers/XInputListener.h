@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cstring>
 #include <X11/Xlib.h>
-#include <X11/extensions/XInput.h>
+#include <X11/extensions/XInput2.h>
 
 #define INVALID_EVENT_TYPE -1
 #define XINAME        "XInputExtension"
@@ -26,9 +26,9 @@ public:
     static int ProximityOutType;
 
 public:
-    static int RegisterEvents(Display *dpy, XDeviceInfo *info, Bool handle_proximity, Window window = -1);
+    static int RegisterEvents(Display *dpy, XIDeviceInfo *info, Bool handle_proximity, Window window = -1);
 
-    static XDeviceInfo **GetDevices(Display *display, int &count);
+    static XIDeviceInfo **GetDevices(Display *display, int &count);
 
     static int SelectXInputEvents(Display *display, Window window = -1);
 
